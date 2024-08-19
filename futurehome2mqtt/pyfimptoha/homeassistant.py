@@ -49,7 +49,7 @@ def create_components(
         # When debugging: Ignore everything except selected_devices if set
         # Format is '<adapter>_<address>', to not have conflicting addresses on different adapters
         if selected_devices and f"{adapter}_{address}" not in selected_devices:
-            print(f"Skipping: {address} {name}")
+            print(f"Skipping: {adapter} {address} {name}")
             continue
 
         print(f"Creating: {adapter} {address} {name}")
@@ -131,7 +131,7 @@ def create_components(
             # Thermostat
             elif service_name == "thermostat":
                 print(f"- Service: {service_name}")
-                status = thermostat.new_thermostat(**common_params, command_topic=command_topic)
+                status = thermostat.new_thermostat(**common_params, command_topic=command_topic, devices=devices)
                 if status:
                     for s in status:
                         statuses.append((s[0], s[1]))
@@ -169,6 +169,7 @@ def get_adapter_name(device):
     else:
         adapter = device["fimp"]["adapter"]
     return adapter
+
 
 def get_room_alias(rooms, room_id):
     room_alias = [room["alias"] for room in rooms if room["id"] == room_id][0]
