@@ -24,6 +24,7 @@ Read more about the [FIMP protocol](https://github.com/futurehomeno/fimp-api).
 - Thermostats
   - Set mode
   - Set target temp
+  - Read current measured temperature (Note that the temperature sensor that have the "Set as main temp sensor" checkbox checked in the Futurehome app will be used)
   - Change fan speed if device supports it (e.g Sensibo)
 - Sensors
   - Battery
@@ -43,10 +44,9 @@ Read more about the [FIMP protocol](https://github.com/futurehomeno/fimp-api).
 
 - Chargepoint (Easee, Zaptec etc.) is not currently supported
 - Scene control (Fibaro button, Heatit Z-Push 4 etc.) is not currently supported
+- Blinds are not currently supported
 - Music players (Sonos etc.) is not currently supported
 - Sirens are not currently supported
-- On some thermostats (e.g Heatit) you are currently not able to readout current
-  measured temperature (room temp sensor or floor temp sensor) directly on the thermostat card as it is on a different device
 - Some devices might still use sensor_power (deprecated) and sensor_voltage (deprecated) instead of `meter_elec`. This needs to be fixed by Futurehome.
 - Shortcuts triggered externally (e.g from Futurehome app) is not logged in logbook
 
