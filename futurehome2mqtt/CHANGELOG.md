@@ -1,3 +1,7 @@
+## 0.3.4
+
+- Removed unused dependency 'requests'
+
 ## 0.3.3
 
 - Fixes: On some thermostats (e.g Heatit) you are currently not able to readout current
