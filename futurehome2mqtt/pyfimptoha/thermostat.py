@@ -7,7 +7,8 @@ def new_thermostat(
         state_topic,
         identifier,
         default_component,
-        command_topic
+        command_topic,
+        devices
 ):
     """
     Creates thermostat in Home Assistant based on FIMP services
@@ -16,18 +17,9 @@ def new_thermostat(
     statuses = []
     supported_thermostat_modes = [mode for mode in device["param"]["supportedThermostatModes"]]
 
-    fan_component = None
-    if "fan_ctrl" in device["services"]:
-        fan_component = new_fan_component(device)
-
-    humid_component = None
-    if "sensor_humid" in device["services"]:
-        humid_component = new_humid_component(device)
-
-    current_temperature_component = None
-    if "sensor_temp" in device["services"]:
-        current_temperature_component = new_current_temperature_component(device)
-    # TODO logic to find thing_role:main on device with same address (e.g heatit on _4)
+    fan_component = new_fan_component(device)
+    humid_component = new_humid_component(device)
+    current_temperature_component = new_current_temperature_component(device, devices)
 
     thermostat_component = {
         "max_temp": 40.0,
@@ -141,6 +133,9 @@ def new_thermostat(
 
 
 def new_fan_component(device):
+    if "fan_ctrl" not in device["services"]:
+        return
+
     fan_ctrl = device["services"]["fan_ctrl"]
     supported_fan_modes = [mode for mode in fan_ctrl["props"]["sup_modes"]]
     fan_component = {
@@ -168,6 +163,9 @@ def new_fan_component(device):
 
 
 def new_humid_component(device):
+    if "sensor_humid" not in device["services"]:
+        return
+
     sensor_humid = device["services"]["sensor_humid"]
     humid_component = {
         "current_humidity_template": "{{ value_json.val | round(0) }}",
@@ -176,9 +174,27 @@ def new_humid_component(device):
     return humid_component
 
 
-def new_current_temperature_component(device):
-    current_temperature_component = {
-        "current_temperature_topic": f'pt:j1/mt:evt{device["services"]["sensor_temp"]["addr"]}',
-        "current_temperature_template": "{{ value_json.val | round(1) }}"
-    }
+def new_current_temperature_component(device, devices):
+    topic = None
+    current_temperature_component = None
+
+    if "sensor_temp" in device["services"]:
+        topic = f"pt:j1/mt:evt{device['services']['sensor_temp']['addr']}"
+    else:
+        # Handling when current_temp sensor is not on the same device (channel)
+        # (e.g Heatit floor sensor on _4 or room sensor on _3)
+        thing_id = device["thing"]
+        for dev in devices:
+            if dev["thing"] == thing_id:
+                topic = [f"pt:j1/mt:evt{service['addr']}" for service_name, service in dev["services"].items() \
+                    if service["props"].get("thing_role") and service["props"]["thing_role"] == "main"]
+                if topic:
+                    topic = topic[0]
+                    break
+
+    if topic:
+        current_temperature_component = {
+            "current_temperature_topic": topic,
+            "current_temperature_template": "{{ value_json.val | round(1) }}"
+        }
     return current_temperature_component

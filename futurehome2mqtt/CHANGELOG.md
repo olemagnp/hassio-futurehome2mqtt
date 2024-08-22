@@ -1,3 +1,10 @@
+## 0.3.3
+
+- Fixes: On some thermostats (e.g Heatit) you are currently not able to readout current
+  measured temperature (room temp sensor or floor temp sensor) directly on the thermostat card as it is on a different device.
+
+Note that the temperature sensor that have the "Set as main temp sensor" checkbox checked in the Futurehome app will be used.
+
 ## 0.3.2
 
 - Added basic HAN sensor support
