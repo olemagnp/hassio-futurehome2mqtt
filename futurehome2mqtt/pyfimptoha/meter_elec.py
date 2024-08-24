@@ -198,7 +198,6 @@ def new_han(
             merged_component = {**default_component, **u_component}
 
             payload = json.dumps(merged_component)
-            print(payload)
             mqtt.publish(f"homeassistant/sensor/{identifier}/config", payload)
 
             # Queue statuses
