@@ -11,7 +11,7 @@ import pyfimptoha.shortcut as shortcut_button
 import pyfimptoha.mode as mode_select
 
 
-SUPPORTED_SENSORS = ["battery", "sensor_lumin", "sensor_presence", "sensor_temp", "sensor_humid"]
+SUPPORTED_SENSORS = ["battery", "sensor_lumin", "sensor_presence", "sensor_temp", "sensor_humid", "sensor_contact"]
 SUPPORTED_LIGHTS = ["out_lvl_switch", "out_bin_switch"]
 
 
@@ -20,8 +20,10 @@ def create_components(
         rooms: list,
         shortcuts: list,
         mode: str,
-        selected_devices: list,
         mqtt: client,
+        selected_devices_mode: str,
+        selected_devices: list,
+        debug: bool
 ):
     """
     Creates HA components out of FIMP devices
@@ -46,14 +48,22 @@ def create_components(
         functionality = device["functionality"]
         room_alias = get_room_alias(rooms, room_id)
 
-        # When debugging: Ignore everything except selected_devices if set
-        # Format is '<adapter>_<address>', to not have conflicting addresses on different adapters
-        if selected_devices and f"{adapter}_{address}" not in selected_devices:
-            print(f"Skipping: {adapter} {address} {name}")
-            continue
+        # When debugging you have the option to (only) include or exclude (some) devices
+        # depending on 'selected_devices_mode'. Default is 'ignored'.
+        # Format is '<adapter_<address>', to not have conflicting addresses on different adapters
+        if selected_devices_mode != "ignored":
+            if selected_devices_mode == "include" and selected_devices and f"{adapter}_{address}" not in selected_devices:
+                if debug:
+                    print(f"Skipping: {adapter} {address} {name}")
+                continue
+            elif selected_devices_mode == "exclude" and f"{adapter}_{address}" in selected_devices:
+                if debug:
+                    print(f"Skipping: {adapter} {address} {name} has been configured to be excluded")
+                continue
 
-        print(f"Creating: {adapter} {address} {name}")
-        print(f"- Functionality: {functionality}")
+        if debug:
+            print(f"Creating: {adapter} {address} {name}")
+            print(f"- Functionality: {functionality}")
 
         for service_name, service in device["services"].items():
             status = None
@@ -62,6 +72,8 @@ def create_components(
             identifier = f"fh_{vinc_id}_{adapter}_{address}_{service_name}"
             state_topic = f"pt:j1/mt:evt{service['addr']}"
             command_topic = f"pt:j1/mt:cmd{service['addr']}"
+            model = device["model"] if device.get("model") and device["model"] else ""
+            model_alias = device["modelAlias"] if device.get("modelAlias") and device["modelAlias"] else model
             default_component = {
                 "name": None,
                 "object_id": identifier,
@@ -70,8 +82,8 @@ def create_components(
                     "identifiers": f"{adapter}_{address}",
                     "name": f"{name}",
                     "suggested_area": f"{room_alias}",
-                    "hw_version": device["model"] if device.get("model") and device["model"] else "",
-                    "model": device["modelAlias"] if device.get("modelAlias") and device["modelAlias"] else "",
+                    "hw_version": f"{model}",
+                    "model": f"{model_alias}",
                     "sw_version": f"{adapter}_{address}"
                 },
                 "state_topic": state_topic
@@ -88,14 +100,16 @@ def create_components(
             # Sensors
             # todo add more sensors: alarm_power?, sensor_power. see old sensor.py
             if service_name in SUPPORTED_SENSORS:
-                print(f"- Service: {service_name}")
+                if debug:
+                    print(f"- Service: {service_name}")
                 status = sensor.new_sensor(**common_params, service_name=service_name)
                 if status:
                     statuses.append(status)
 
             # Meter_elec
             elif service_name == "meter_elec":
-                print(f"- Service: {service_name}")
+                if debug:
+                    print(f"- Service: {service_name}")
                 if device["type"]["type"] == "meter" and \
                         device["type"]["subtype"] == "main_elec": # HAN Meter
                     status = meter_elec.new_han(**common_params, service_name=service_name)
@@ -107,7 +121,8 @@ def create_components(
 
             # Door lock
             elif service_name == "door_lock":
-                print(f"- Service: {service_name}")
+                if debug:
+                    print(f"- Service: {service_name}")
                 status = lock.door_lock(**common_params, command_topic=command_topic)
                 if status:
                     statuses.append(status)
@@ -115,7 +130,8 @@ def create_components(
             # Lights
             elif functionality == "lighting":
                 if service_name in SUPPORTED_LIGHTS:
-                    print(f"- Service: {service_name}")
+                    if debug:
+                        print(f"- Service: {service_name}")
                     status = light.new_light(**common_params, service_name=service_name, command_topic=command_topic)
                 if status:
                     statuses.append(status)
@@ -123,24 +139,21 @@ def create_components(
             # Appliance
             elif functionality == "appliance":
                 if service_name == "out_bin_switch":
-                    print(f"- Service: {service_name}")
+                    if debug:
+                        print(f"- Service: {service_name}")
                     status = appliance.new_switch(**common_params, command_topic=command_topic)
                 if status:
                     statuses.append(status)
 
             # Thermostat
             elif service_name == "thermostat":
-                print(f"- Service: {service_name}")
+                if debug:
+                    print(f"- Service: {service_name}")
                 status = thermostat.new_thermostat(**common_params, command_topic=command_topic, devices=devices)
                 if status:
                     for s in status:
                         statuses.append((s[0], s[1]))
 
-
-    # Shortcuts (displayed as buttons)
-    print('Creating button devices for shortcuts. FIMP reported %s shortcuts' % (len(shortcuts)))
-    for shortcut in shortcuts:
-        shortcut_button.new_button(mqtt, shortcut)
 
     # Mode select (home, away, sleep, vacation)
     status = None
@@ -150,6 +163,12 @@ def create_components(
         statuses.append(status)
 
 
+    # Shortcuts (displayed as buttons)
+    print('Creating button devices for shortcuts. FIMP reported %s shortcuts' % (len(shortcuts)))
+    for shortcut in shortcuts:
+        shortcut_button.new_button(mqtt, shortcut, debug)
+
+
     mqtt.loop()
     time.sleep(2)
     print("Publishing statuses...")
@@ -157,7 +176,8 @@ def create_components(
         topic = state[0]
         payload = state[1]
         mqtt.publish(topic, payload)
-        print(topic)
+        if debug:
+            print(topic)
     print("Finished pushing statuses...")
 
 

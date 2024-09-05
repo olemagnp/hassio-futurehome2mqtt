@@ -1,6 +1,6 @@
 import json
 
-def new_button(mqtt, shortcut):
+def new_button(mqtt, shortcut, debug):
     """
     Creates buttons in Home Assistant for each shortcut created in Futurehome
     """
@@ -11,15 +11,14 @@ def new_button(mqtt, shortcut):
     command_topic = "pt:j1/mt:cmd/rt:app/rn:vinculum/ad:1"
     component = {
         "icon": "mdi:arrow-right-bold-hexagon-outline",
-        "name": None,
+        "name": f"{shortcut_name}",
         "object_id": identifier,
         "unique_id": identifier,
         "device": {
-            "identifiers": f"shortcut_{shortcut_id}",
-            "name": f"{shortcut_name}",
-            "suggested_area": "Shortcuts",
-            "manufacturer": "Futurehome",
-            "model": "shortcut"
+            "identifiers": "futurehome_smarthub",
+            "name": "Futurehome Smarthub",
+            "suggested_area": "Futurehome Smarthub",
+            "manufacturer": "Futurehome"
         },
         "command_topic": command_topic,
         "command_template": f"""{{
@@ -44,7 +43,8 @@ def new_button(mqtt, shortcut):
 
     payload = json.dumps(component)
     mqtt.publish(f"homeassistant/button/{identifier}/config", payload)
-    print(f"Creating button device for shortcut id: {shortcut_id}")
+    if debug:
+        print(f"Creating button device for shortcut id: {shortcut_id}")
 
 
     # Device trigger - logs triggered shortcuts from e.g Futurehome app

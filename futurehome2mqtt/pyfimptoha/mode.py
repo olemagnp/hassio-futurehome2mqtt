@@ -11,15 +11,14 @@ def create(mqtt, mode):
     state_topic = "pt:j1/mt:evt/rt:app/rn:vinculum/ad:1"
     component = {
         "icon": "mdi:hexagon",
-        "name": None,
+        "name": "Modus",
         "object_id": identifier,
         "unique_id": identifier,
         "device": {
-            "identifiers": "mode",
-            "name": "Modus",
-            "suggested_area": "Mode",
-            "manufacturer": "Futurehome",
-            "model": "mode"
+            "identifiers": "futurehome_smarthub",
+            "name": "Futurehome Smarthub",
+            "suggested_area": "Futurehome Smarthub",
+            "manufacturer": "Futurehome"
         },
         "command_topic": command_topic,
         "state_topic": state_topic,

@@ -1,9 +1,31 @@
+## 0.3.5
+
+- Added support for contact sensors
+  - Subtypes `door`, `window`, `garage` supported
+- Added more checks on reports from sensors
+- Added support to select if you want to include or excluding certain devices from being synced
+- Move mode and shortcut to one device "Futurehome Smarthub"
+- Updated README
+  - Support for contact sensor
+  - Describing the selected_devices in configuration
+- (dev) Added symbolic link for README.md into `futurehome2mqtt` directory.
+  This allows the add-on store to show the content of README.md instead of nothing.
+- (dev) Refactored client.py, and removed fimp.py
+- (dev) Changed env variables to snake_case for readability
+- (dev) Changed from `str` to `password` for fimp_password on configuration screen
+- (dev) Added breaking_versions to config file
+- (dev) Temporarily fixed debug option - verbose logging enabled if option is set to true.
+  Plan to use better logger with loglevels.
+- (dev) Removed name from device object for sensor_temp.
+  This will prevent device name for Heatit z-trm3 to be overwritten with the sensor name
+
 ## 0.3.4
 
 - Removed unused dependency 'requests'
 
 ## 0.3.3
 
+- Added logo and icon
 - Fixes: On some thermostats (e.g Heatit) you are currently not able to readout current
   measured temperature (room temp sensor or floor temp sensor) directly on the thermostat card as it is on a different device.
 
@@ -22,6 +44,12 @@ Note that the temperature sensor that have the "Set as main temp sensor" checkbo
 - (dev) moved devcontainer.json file to the recommended folder. Ref [docs](https://developers.home-assistant.io/docs/add-ons/testing/)
 
 ## 0.3.0
+
+### Breaking changes
+
+Note that version 0.3.x includes breaking changes from 0.2.x.
+This is mainly due to the refactor to include adapter name in the identifiers, and how entities are grouped to one device.
+You may have to update all entities in dashboards and automations etc.
 
 ### New, fixed, and improved:
 
