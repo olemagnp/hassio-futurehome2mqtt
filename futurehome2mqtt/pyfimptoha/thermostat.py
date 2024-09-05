@@ -36,10 +36,12 @@ def new_thermostat(
             }
         """,
         "mode_command_topic": command_topic,
-        "mode_state_template": """
-            {% if value_json.type == 'evt.mode.report' %}
-                {{ value_json.val }}
-            {% endif %}
+        "mode_state_template": f"""
+            {{% if value_json.type == 'evt.mode.report' %}}
+                {{{{ value_json.val }}}}
+            {{% else %}}
+                {{{{ states('climate.{identifier}') }}}}
+            {{% endif %}}
         """,
         "mode_state_topic": state_topic,
         "modes": supported_thermostat_modes,
@@ -168,7 +170,11 @@ def new_humid_component(device):
 
     sensor_humid = device["services"]["sensor_humid"]
     humid_component = {
-        "current_humidity_template": "{{ value_json.val | round(0) }}",
+        "current_humidity_template": """
+            {% if value_json.type == 'evt.sensor.report' %}
+                {{ value_json.val | round(0) }}
+            {% endif %}
+        """,
         "current_humidity_topic": f"pt:j1/mt:evt{sensor_humid['addr']}"
     }
     return humid_component
@@ -195,6 +201,10 @@ def new_current_temperature_component(device, devices):
     if topic:
         current_temperature_component = {
             "current_temperature_topic": topic,
-            "current_temperature_template": "{{ value_json.val | round(1) }}"
+            "current_temperature_template": """
+                {% if value_json.type == 'evt.sensor.report' %}
+                    {{ value_json.val | round(1) }}
+                {% endif %}
+            """
         }
     return current_temperature_component

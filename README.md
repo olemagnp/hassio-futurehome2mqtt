@@ -32,6 +32,7 @@ Read more about the [FIMP protocol](https://github.com/futurehomeno/fimp-api).
   - Presence
   - Temperature
   - Humidity
+  - Contact
   - Accumulated energy usage (kWh) (`meter_elec`) for devices supporting this
   - Power (W) (`meter_elec`) for devices supporting this
   - Voltage (V) (`meter_elec`) for devices supporting this
@@ -42,11 +43,13 @@ Read more about the [FIMP protocol](https://github.com/futurehomeno/fimp-api).
 
 ## Known issues / limitations
 
-- Chargepoint (Easee, Zaptec etc.) is not currently supported
+- Chargepoint (FH Charge, Easee, Zaptec etc.) is not currently supported
 - Scene control (Fibaro button, Heatit Z-Push 4 etc.) is not currently supported
 - Blinds are not currently supported
-- Music players (Sonos etc.) is not currently supported
 - Sirens are not currently supported
+- Leak detectors are not currently supported
+- Garage doors are not currently supported
+- Music players (Sonos etc.) is not currently supported - use Sonos integration in Home Assistant
 - Some devices might still use sensor_power (deprecated) and sensor_voltage (deprecated) instead of `meter_elec`. This needs to be fixed by Futurehome.
 - Shortcuts triggered externally (e.g from Futurehome app) is not logged in logbook
 
@@ -81,6 +84,8 @@ Settings -> Device & services -> add integration -> search for `MQTT` -> select 
 2. Install the addon 'Futurehome FIMP to MQTT'
    - Select `Futurehome FIMP integration` in the Add-on store -> install
 3. Configure the addon with the same parameters as before
+   - If you want to include or exclude certain devices, please specify with radio buttons, and then the devices in `selected_devices` with this format: <adapter>\_<address>. If you want to include all devices, leave radio button on `ignored`.
+     Devices without a room will by default be ignored.
 4. Start it. Supported devices should appear in the Home Assistant UI
 
 # Development
@@ -110,7 +115,7 @@ pip install -r requirements.txt
    ```
 2. Edit `.env` and fill in hostnames and credentials
 
-3. Run `python run.py serve`
+3. Run `python run.py`
 
 # Alternative FIMP integrations
 

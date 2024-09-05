@@ -41,7 +41,11 @@ def new_switch(
                 "src": "homeassistant"
             }
         """,
-        "value_template": '{{ value_json.val }}',
+        "value_template": """
+            {% if value_json.type == 'evt.binary.report' %}
+                {{ value_json.val }}
+            {% endif %}
+        """,
         "state_on": True,
         "state_off": False
     }
