@@ -16,6 +16,8 @@ Read more about the [FIMP protocol](https://github.com/futurehomeno/fimp-api).
 
 - Appliances (switches in HA)
   - Wall plugs like Fibaro Wall plug is supported
+- Boiler
+  - Connected with a relay device (e.g Futurehome Puck Relay)
 - Lights (lights in HA)
   - Dimmers - On/Off and brightness. Tested with Fibaro dimmer 2
   - Switches - On/Off. Tested with Fibaro wall plug
@@ -33,10 +35,15 @@ Read more about the [FIMP protocol](https://github.com/futurehomeno/fimp-api).
   - Temperature
   - Humidity
   - Contact
-  - Accumulated energy usage (kWh) (`meter_elec`) for devices supporting this
-  - Power (W) (`meter_elec`) for devices supporting this
-  - Voltage (V) (`meter_elec`) for devices supporting this
-  - Current (A) (`meter_elec`) for devices supporting this
+  - Meter_elec sensors (varies from device to device if they are supported)
+    - Accumulated energy usage (kWh)
+    - Power (W)
+    - Voltage (V)
+    - Current (A)
+    - p_import (W)
+    - e_import (kWh)
+    - p_import_react (var)
+    - p_export_react (var)
 - Modus (home, away, sleep and vacation)
   - Set in entity `select.fh_mode`
 - Shortcuts

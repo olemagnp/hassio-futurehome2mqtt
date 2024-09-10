@@ -1,3 +1,13 @@
+## 0.3.6
+
+- Added more sensors in meter_elec
+  - p_import
+  - e_import
+  - p_import_react
+  - p_export_react
+- Added 'boiler' type as switch
+- (dev) Some cleanup in meter_elec.py
+
 ## 0.3.5
 
 - Added support for contact sensors
