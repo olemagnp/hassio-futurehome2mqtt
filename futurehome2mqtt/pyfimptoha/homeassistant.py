@@ -110,11 +110,7 @@ def create_components(
             elif service_name == "meter_elec":
                 if debug:
                     print(f"- Service: {service_name}")
-                if device["type"]["type"] == "meter" and \
-                        device["type"]["subtype"] == "main_elec": # HAN Meter
-                    status = meter_elec.new_han(**common_params, service_name=service_name)
-                else:
-                    status = meter_elec.new_sensor(**common_params, service_name=service_name)
+                status = meter_elec.new_sensor(**common_params, service_name=service_name)
                 if status:
                     for s in status:
                         statuses.append((s[0], s[1]))
@@ -137,7 +133,7 @@ def create_components(
                     statuses.append(status)
 
             # Appliance
-            elif functionality == "appliance":
+            elif functionality == "appliance" or device["type"]["type"] == "boiler":
                 if service_name == "out_bin_switch":
                     if debug:
                         print(f"- Service: {service_name}")
