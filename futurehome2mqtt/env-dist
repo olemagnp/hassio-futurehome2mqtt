@@ -5,5 +5,5 @@ FIMP_PASSWORD=
 FIMP_PORT=1884
 CLIENT_ID=fimp2mqtt
 DEBUG=False
-SELECTED_DEVICES_MODE="ignored" # ignored, include, exclude
+SELECTED_DEVICES_MODE="default" # default, include, exclude
 SELECTED_DEVICES=

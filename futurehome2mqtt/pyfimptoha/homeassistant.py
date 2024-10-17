@@ -49,9 +49,9 @@ def create_components(
         room_alias = get_room_alias(rooms, room_id)
 
         # When debugging you have the option to (only) include or exclude (some) devices
-        # depending on 'selected_devices_mode'. Default is 'ignored'.
+        # depending on 'selected_devices_mode'.
         # Format is '<adapter_<address>', to not have conflicting addresses on different adapters
-        if selected_devices_mode != "ignored":
+        if selected_devices_mode != "default":
             if selected_devices_mode == "include" and selected_devices and f"{adapter}_{address}" not in selected_devices:
                 if debug:
                     print(f"Skipping: {adapter} {address} {name}")

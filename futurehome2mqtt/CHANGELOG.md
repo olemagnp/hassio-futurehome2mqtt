@@ -1,3 +1,8 @@
+## 0.3.7
+
+- Updated README
+- Changed `selected_devices_mode` defualt option from 'ignored' to 'default' to include all supported devices.
+
 ## 0.3.6
 
 - Added more sensors in meter_elec
