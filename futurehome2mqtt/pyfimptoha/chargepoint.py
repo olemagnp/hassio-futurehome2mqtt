@@ -1,6 +1,5 @@
 import json
 import typing
-from warnings import warn
 
 uuid_gen = """
 {%- macro unique_id() -%}
@@ -22,13 +21,6 @@ def new_chargepoint(
     default_component,
     command_topic,
 ):
-    print("Got chargepoint:")
-    print(json.dumps(device, indent=2))
-    print(state_topic)
-    print(identifier)
-    print(default_component)
-    print(command_topic)
-
     supported_max_current = device["services"]["chargepoint"]["props"][
         "sup_max_current"
     ]
